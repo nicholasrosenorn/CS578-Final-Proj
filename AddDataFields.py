@@ -6,48 +6,54 @@ import pandas as pd
 #column indexes
 changeindex = 10
 closeindex = 7
-_30daychangeindex = 11
-_60daychangeindex = 12
-_90daychangeindex = 13
+_22daychangeindex = 11
+_44daychangeindex = 12
+_66daychangeindex = 13
 
 
 def addAll(df, length):
     calcDailyChange(df, length)
-    calc30DayChange(df, length)
-    calc60DayChange(df, length)
-    calc90DayChange(df, length)
+    calc22DayChange(df, length)
+    calc44DayChange(df, length)
+    calc66DayChange(df, length)
 
 #finds the change from close yesterday to close today. 
 #effectivly change over today
 def calcDailyChange(df, length):
-    df['<CHANGE>'] = 0 
+    df['<CHANGE>'] = "{:.4f}".format(0.000)
     for i in range(1, length):
-        df.iat[i, changeindex] = (df.iat[i, closeindex] - df.iat[i-1, closeindex]) / df.iat[i-1, closeindex]
+        df.iat[i, changeindex] = "{:.4f}".format((df.iat[i, closeindex] - df.iat[i-1, closeindex]) / df.iat[i-1, closeindex])
 
 
-#finds 30 day return
-def calc30DayChange(df, length):
-    df['<30Day>'] = 0 
-    for i in range(30, length):
-        df.iat[i, _30daychangeindex] = (df.iat[i, closeindex] - df.iat[i-30, closeindex]) / df.iat[i-30, closeindex]
+#finds 22 weekday return
+def calc22DayChange(df, length):
+    df['<22Day>'] = "{:.4f}".format(0.000)
+    for i in range(22, length):
+        df.iat[i, _22daychangeindex] = "{:.4f}".format((df.iat[i, closeindex] - df.iat[i-22, closeindex]) / df.iat[i-22, closeindex])
 
 #finds 60 day return
-def calc60DayChange(df, length):
-    df['<60Day>'] = 0 
-    for i in range(60, length):
-        df.iat[i, _60daychangeindex] = (df.iat[i, closeindex] - df.iat[i-60, closeindex]) / df.iat[i-60, closeindex]
+def calc44DayChange(df, length):
+    df['<44Day>'] = "{:.4f}".format(0.000)
+    for i in range(44, length):
+        df.iat[i, _44daychangeindex] = "{:.4f}".format((df.iat[i, closeindex] - df.iat[i-44, closeindex]) / df.iat[i-44, closeindex])
 
 #finds 90 day return
-def calc90DayChange(df, length):
-    df['<90Day>'] = 0 
-    for i in range(90, length):
-        df.iat[i, _90daychangeindex] = (df.iat[i, closeindex] - df.iat[i-90, closeindex]) / df.iat[i-90, closeindex]
+def calc66DayChange(df, length):
+    df['<66Day>'] = "{:.4f}".format(0.000)
+    for i in range(66, length):
+        df.iat[i, _66daychangeindex] = "{:.4f}".format((df.iat[i, closeindex] - df.iat[i-66, closeindex]) / df.iat[i-66, closeindex])
+
 
 
 #def calcVolatility():
 
-
 #def calcBeta():
+
+#def spReturn():
+
+#def pharmIndustry():
+
+
 
 
     

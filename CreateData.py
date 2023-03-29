@@ -18,6 +18,7 @@ outputfile = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Data
 singlefilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\aac.us.txt"
 
 
+
 #using to test methods on single text files
 def importdata():
     df = pd.read_csv(singlefilepath, sep=",")
@@ -25,8 +26,14 @@ def importdata():
     length = len(df.index)
     print(df[0:1])
     print(df[length-1:length])
+    df = df.round(2)
+
     AddDataFields.addAll(df, length)
     print(df)
+    #df.astype({'<CHANGE>': '.2f'})
+    print(df.dtypes)
+    
+    df.to_csv(r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\aac.us_test.txt", sep = '\t')
     
 
 
