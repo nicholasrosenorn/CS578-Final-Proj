@@ -16,22 +16,24 @@ import AddDataFields
 folderpath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset"
 outputfile = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\combined.txt"
 singlefilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\aac.us.txt"
+spyfilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\spy.us.txt"
 
 
 
 #using to test methods on single text files
 def importdata():
     df = pd.read_csv(singlefilepath, sep=",")
-    print(df)
+    spy = pd.read_csv(spyfilepath, sep = ",")
     length = len(df.index)
-    print(df[0:1])
-    print(df[length-1:length])
+    spylength = len(spy.index)
     df = df.round(2)
+    spy = spy.round(2)
 
-    AddDataFields.addAll(df, length)
-    print(df)
-    #df.astype({'<CHANGE>': '.2f'})
-    print(df.dtypes)
+    df = AddDataFields.addAll(df, length)
+    spy = AddDataFields.addAll(spy, spylength)
+    #print(spy)
+    df = AddDataFields.market(df, length, spy)
+    
     
     df.to_csv(r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\aac.us_test.txt", sep = '\t')
     
