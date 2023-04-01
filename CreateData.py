@@ -1,3 +1,11 @@
+#imports data and calls methods to add datafields
+#import data is used to test methods
+#import group data is method to use on whole data set when code is finialzed
+#will return a full data set that can be analyzed for data of interest
+
+#in: text files of stocks, s and p data, interest rates
+#out: a full text file of concatenated stocks with added fields
+
 import pandas as pd
 import glob
 import os
@@ -15,7 +23,7 @@ import AddDataFields
 #paths to change for local use
 folderpath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset"
 outputfile = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\combined.txt"
-singlefilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\aac.us.txt"
+singlefilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\aapl.us.txt"
 spyfilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\spy.us.txt"
 
 
@@ -29,13 +37,14 @@ def importdata():
     df = df.round(2)
     spy = spy.round(2)
 
-    df = AddDataFields.addAll(df, length)
-    spy = AddDataFields.addAll(spy, spylength)
-    #print(spy)
-    df = AddDataFields.market(df, length, spy)
+    df = AddDataFields.addPercentChanges(df, length)
+    length = len(df.index)
+    spy = AddDataFields.addPercentChanges(spy, spylength)
+    df = AddDataFields.marketData(df, length, spy)
+    df = AddDataFields.addOtherData(df, length)
     
     
-    df.to_csv(r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\aac.us_test.txt", sep = '\t')
+    df.to_csv(r"C:\Users\imhun\Documents\CS 578\Project\Data set\aapl.us_test.txt", sep = '\t')
     
 
 
