@@ -3,7 +3,7 @@
 #add: 
 #   Select Data
 #   European put price 
-#   American perpetual put price TODO
+#   American perpetual put price TODO IAN
 #   Calc Profit
 #   
 

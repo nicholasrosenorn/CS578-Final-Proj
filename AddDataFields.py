@@ -5,12 +5,12 @@
 #   22 day change %
 #   44 day change %
 #   66 day change %
-#   volatility
+#   volatility IAN
 #   s and p day change %
-#   beta
-#   1 year interest rate TODO
-#   pharmacutical labal TODO
-#   earnings per share TODO: note: this maybe should done after getting data of interest (ie: in generateMLData)
+#   beta IAN
+#   1 year interest rate TODO NICK
+#   pharmacutical labal TODO NICK
+#   earnings per share TODO: note: this maybe should done after getting data of interest (ie: in generateMLData) JP
 
 
 #in: none
@@ -152,7 +152,7 @@ def futurePrices(df, length):
     return df
 
 
-#caluclates volatility over last 22 days (b/c VIX is 30 days)
+#caluclates volatility over last 22 days (b/c VIX is 30 days), IAN
 # and then annualizes it
 # assume 252 trading days in a year
 def calcVolatility(df, length):
@@ -166,7 +166,7 @@ def calcVolatility(df, length):
     return df
 
 
-#TODO: check math, im very sure it is wrong
+#TODO: check math, im very sure it is wrong, IAN
 #calculates covariance between market and stock
 #done over whole period
 #use varaince of spy over whole period

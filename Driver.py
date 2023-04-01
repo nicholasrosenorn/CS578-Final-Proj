@@ -35,7 +35,7 @@ def preparedata():
 
     return df
    
-#TODO
+#TODO JP
 #may reorganize structure
 # do we need to code own or can use sklearn?
 def learnAlgorithm():
