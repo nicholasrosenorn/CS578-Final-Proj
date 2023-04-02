@@ -46,11 +46,17 @@ def addPercentChanges(df, length):
     df = calc66DayChange(df, length)
     df = calcVolatility(df, length)
 
+    #date to datetime object
+    df["<DATE>"] = pd.to_datetime(df["<DATE>"], format='%Y%m%d')
+
     return df
 
 def marketData(df, length, spy):
     df = spReturn(df, length, spy)
     df = calcBeta(df, length, spy)
+   
+    #date to datetime object
+    df["<DATE>"] = pd.to_datetime(df["<DATE>"], format='%Y%m%d')
 
     return df
 
@@ -199,6 +205,17 @@ def spReturn(df, length, spy):
                               '<HV>_x' : '<HV>',
                               '<CHANGE>_y' : '<SPY>',
                               '<HV>_y' : '<SPY_HV>'})
+
+    return df
+
+# adds interest rate data to dfs
+def interest_rates(df):
+    # read interest rate data 
+    int_rates = pd.read_csv("Development Dataset/yield-curve-rates-1990-2021.csv")
+    int_rates["<DATE>"] = pd.to_datetime(int_rates["Date"], format='%m/%d/%y')
+    
+    #join data by date
+    df = df.merge(int_rates, on = '<DATE>', how = 'left')
 
     return df
 
