@@ -5,9 +5,9 @@
 #   22 day change %
 #   44 day change %
 #   66 day change %
-#   volatility IAN
+#   volatility 
 #   s and p day change %
-#   beta IAN
+#   beta 
 #   1 year interest rate TODO NICK
 #   pharmacutical labal TODO NICK
 #   earnings per share TODO: note: this maybe should done after getting data of interest (ie: in generateMLData) JP
@@ -29,12 +29,13 @@ _22daychangeindex = 11
 _44daychangeindex = 12
 _66daychangeindex = 13
 hvindex = 14
-spyindex = 15
-spyhvindex = 16
-betaindex = 17
-f22dayindex = 18
-f44dayindex = 19
-f66dayindex = 20
+spycloseindex = 15
+spyindex = 16
+spyhvindex = 17
+betaindex = 18
+f22dayindex = 19
+f44dayindex = 20
+f66dayindex = 21
 dateindex = 2
 
 
@@ -57,6 +58,8 @@ def marketData(df, length, spy):
 def addOtherData(df, length):
     df = futurePrices(df, length)
 
+    df = df.drop(columns = '<SPY_CLOSE>')
+
     return df
     
 
@@ -71,7 +74,7 @@ def removeColumns(df, length):
     global _44daychangeindex
     global _66daychangeindex
     global hvindex
-    global spyindex
+    global spycloseindex, spyindex
     global spyhvindex
     global betaindex, f22dayindex, f44dayindex, f66dayindex
 
@@ -83,12 +86,13 @@ def removeColumns(df, length):
     _44daychangeindex = 12 - change
     _66daychangeindex = 13 - change
     hvindex = 14 - change
-    spyindex = 15 - change
-    spyhvindex = 16 - change
-    betaindex = 17 - change
-    f22dayindex = 18 - change
-    f44dayindex = 19 - change
-    f66dayindex = 20 - change
+    spycloseindex = 15 - change
+    spyindex = 16 - change
+    spyhvindex = 17 - change
+    betaindex = 18 - change
+    f22dayindex = 19 - change
+    f44dayindex = 20 - change
+    f66dayindex = 21 - change
 
 
     #also trim length
@@ -152,43 +156,74 @@ def futurePrices(df, length):
     return df
 
 
-#caluclates volatility over last 22 days (b/c VIX is 30 days), IAN
+#caluclates volatility over last 22 days (b/c VIX is 30 days)
 # and then annualizes it
-# assume 252 trading days in a year
+#SOA version of volatility for lognormal stock model
 def calcVolatility(df, length):
     df['<HV>'] = "{:.4f}".format(0.0000)
-    justHV = df.iloc[:, changeindex: changeindex+1].to_numpy()
-    justHV = justHV.astype(float)
+    justclose = df.iloc[:, closeindex: closeindex+1].to_numpy()
+    justclose = justclose.astype(float)
+    log_change = list()
+    for i in range(1, length):
+        log_change.append(math.log(justclose[i] / justclose[i-1]))
     for i in range(23, length):
-        variance = np.var(justHV[i-23:i])
-        df.iat[i, hvindex] = "{:.4f}".format(math.sqrt(variance * 252))
+        variance = np.var(log_change[i-23:i], ddof = 1)
+        df.iat[i, hvindex] = "{:.4f}".format(math.sqrt(variance * 365))
 
     return df
 
 
-#TODO: check math, im very sure it is wrong, IAN
+
 #calculates covariance between market and stock
 #done over whole period
 #use varaince of spy over whole period
 def calcBeta(df, length, spy):
-    hv = df.iloc[:, hvindex : hvindex+1].to_numpy()
-    spyhv = df.iloc[:, spyhvindex : spyhvindex+1].to_numpy()
-    hv = hv.astype(float)
-    spyhv = spyhv.astype(float)
-    covariance = np.cov(hv.T, spyhv.T)
+    #stock_change = df.iloc[:, closeindex : closeindex+1].to_numpy()
+    #spy_change = df.iloc[:, spycloseindex : spycloseindex+1].to_numpy()
+    #spyhv = df.iloc[:, spyhvindex : spyhvindex+1].to_numpy()
+    
+    #stock_change = stock_change.astype(float)
+    #spy_change = spy_change.astype(float)
+    #spyhv = spyhv.astype(float)
 
-    spychange= df.iloc[:, spyindex: spyindex+1].to_numpy()
-    spychange = spychange.astype(float)
-    variance = np.var(spychange)
+    #keeping this here in case I need it
+    """
+    log_stock = list()
+    log_spy = list()
+    for i in range(1, length):
+        log_stock.append(math.log(stock_change[i] / stock_change[i-1]))
+    
+        log_spy.append(math.log(spy_change[i] / spy_change[i-1]))
 
-    df['<BETA>'] = "{:.4f}".format(covariance[1,0] / variance)
+    spy_var = np.var(log_spy, ddof = 1)
+    covariance = np.cov(log_stock, log_spy)
+
+
+    print(covariance)
+    print(spy_var)
+    print(spy_var * math.sqrt(365))
+    print(np.var(log_stock) * math.sqrt(365),  math.sqrt(np.var(log_stock) )* math.sqrt(365))
+
+        """
+
+    stock_changep = df.iloc[:, changeindex : changeindex+1].to_numpy()
+    spy_changep = df.iloc[:, spyindex : spyindex+1].to_numpy()
+    stock_changep = stock_changep.astype(float)
+    spy_changep = spy_changep.astype(float)
+
+    spy_var = np.var(spy_changep)
+    covariance = np.cov(spy_changep.T, stock_changep.T)
+
+
+
+    df['<BETA>'] = "{:.4f}".format(covariance[1,0] / spy_var )
     return df
 
 
 #attaches daily return of S&P to the stock at each date
 def spReturn(df, length, spy):
     df = df.merge(spy, on = '<DATE>', how = 'left')
-    todrop = ['<TICKER>_y', '<CLOSE>_y', '<22Day>_y', '<44Day>_y', '<66Day>_y']
+    todrop = ['<TICKER>_y', '<22Day>_y', '<44Day>_y', '<66Day>_y']
     df = df.drop(columns = todrop)
     df = df.rename(columns = {'<TICKER>_x' : '<TICKER>',
                               '<CLOSE>_x' : '<CLOSE>',
@@ -197,7 +232,8 @@ def spReturn(df, length, spy):
                               '<44Day>_x' : '<44Day>',
                               '<66Day>_x' : '<66Day>',
                               '<HV>_x' : '<HV>',
-                              '<CHANGE>_y' : '<SPY>',
+                              '<CLOSE>_y' : '<SPY_CLOSE>',
+                              '<CHANGE>_y' : '<SPY_CHANGE>',
                               '<HV>_y' : '<SPY_HV>'})
 
     return df
