@@ -61,17 +61,22 @@ def importdatagroup():
 
     li = []
 
-    print(path)
-    print(all_files)
+    spy = pd.read_csv(spyfilepath, sep = ",")
+    spylength = len(spy.index)
+    spy = spy.round(2)
+    spy = AddDataFields.addAll(spy, spylength)
+
     for filename in all_files:
-        df = pd.read_csv(filename, index_col=None, header=0)
+        df = pd.read_csv(filename, sep=",", index_col=None, header=0)
+        length = len(df.index)
+        df = df.round(2)
+        df = AddDataFields.addAll(df, length)
+        df = AddDataFields.market(df, length, spy)
         li.append(df)
 
     frame = pd.concat(li, axis=0, ignore_index=True)
 
     frame.to_csv(outputfile, sep = '\t')
-
-    
 
 
 #importdatagroup()
