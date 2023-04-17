@@ -22,7 +22,7 @@ import AddDataFields
 
 #paths to change for local use
 folderpath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset"
-outputfile = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\combined.txt"
+outputfile = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\output\combined.txt"
 singlefilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\aapl.us.txt"
 spyfilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\spy.us.txt"
 
@@ -50,8 +50,8 @@ def importdata():
 
 
 
-importdata()
-print("DONE")
+#importdata()
+#print("DONE")
 
 
 #using to test methods on group of text files
@@ -64,19 +64,24 @@ def importdatagroup():
     spy = pd.read_csv(spyfilepath, sep = ",")
     spylength = len(spy.index)
     spy = spy.round(2)
-    spy = AddDataFields.addAll(spy, spylength)
+    spy = AddDataFields.addPercentChanges(spy, spylength)
 
     for filename in all_files:
+        print("current file: ", filename)
         df = pd.read_csv(filename, sep=",", index_col=None, header=0)
         length = len(df.index)
         df = df.round(2)
-        df = AddDataFields.addAll(df, length)
-        df = AddDataFields.market(df, length, spy)
+        df = AddDataFields.addPercentChanges(df, length)
+        length = len(df.index) #need to do it a second time because addPercentChanges trims the dataset based on given date
+        df = AddDataFields.marketData(df, length, spy)
+        df = AddDataFields.addOtherData(df, length)
         li.append(df)
 
     frame = pd.concat(li, axis=0, ignore_index=True)
 
+    #make sure output file is not in "path" because then it gets included in "all_files"
     frame.to_csv(outputfile, sep = '\t')
 
 
-#importdatagroup()
+importdatagroup()
+print("DONE GROUP")

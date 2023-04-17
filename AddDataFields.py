@@ -8,7 +8,7 @@
 #   volatility 
 #   s and p day change %
 #   beta 
-#   1 year interest rate TODO NICK
+#   1 year interest rate
 #   pharmacutical labal TODO NICK
 #   earnings per share TODO: note: this maybe should done after getting data of interest (ie: in generateMLData) JP
 
@@ -63,6 +63,7 @@ def marketData(df, length, spy):
 
 def addOtherData(df, length):
     df = futurePrices(df, length)
+    df = interest_rates(df)
 
     df = df.drop(columns = '<SPY_CLOSE>')
 
@@ -253,15 +254,14 @@ def interest_rates(df):
     #join data by date
     df = df.merge(int_rates, on = '<DATE>', how = 'left')
 
+    todrop = ['Date', '1 Mo', '2 Mo', '3 Mo', '4 Mo', '6 Mo', '2 Yr', '3 Yr', '5 Yr', '7 Yr', '10 Yr', '20 Yr', '30 Yr']
+    df = df.drop(columns = todrop)
+
     return df
 
 #TODO
 #label if compnay is a pharmacutical company
 #def pharmIndustry():
-
-#TODO
-#attaches return of 1 year T-bill to each date
-#def riskFreeReturn():
 
 
 #TODO
