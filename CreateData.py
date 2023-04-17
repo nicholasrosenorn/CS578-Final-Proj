@@ -10,6 +10,7 @@ import pandas as pd
 import glob
 import os
 import AddDataFields
+import Header
 
 #data from https://stooq.com/db/h/ 
 #U.S daily data
@@ -21,10 +22,10 @@ import AddDataFields
 #I created a subset of 10 files to use for testing and developing
 
 #paths to change for local use
-folderpath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset"
-outputfile = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\output\combined.txt"
+folderpath = Header.raw_stock_folder
+outputfile = Header.combined_stock_data
+spyfilepath = Header.spy_path
 singlefilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\aapl.us.txt"
-spyfilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\spy.us.txt"
 
 
 
@@ -66,8 +67,15 @@ def importdatagroup():
     spy = spy.round(2)
     spy = AddDataFields.addPercentChanges(spy, spylength)
 
+    i = 0
     for filename in all_files:
-        print("current file: ", filename)
+        
+        #just to keep track of progess
+        i = i+1
+        if (i % 100 == 0):
+            print("Progress: ", i)
+
+
         df = pd.read_csv(filename, sep=",", index_col=None, header=0)
         length = len(df.index)
         df = df.round(2)

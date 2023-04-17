@@ -7,10 +7,10 @@
 
 import pandas as pd
 import GenerateMLData
+import Header
 
 #This is all data in one file
-inputfile = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\output\combined.txt" 
-
+inputfile = Header.combined_stock_data
 
 #hyperparameters:
 strikepercentage = .9   #percentage of stock price to strike price
@@ -31,8 +31,8 @@ def preparedata():
     df = GenerateMLData.selectData(df, minstockprice, minstockgain)
 
     df = GenerateMLData.calcProfit(df, strikepercentage, daystoexpire, pricemodel, profitformula)
-    print(df)
 
+    df.to_csv(Header.data_for_ml, sep = '\t', index= False)
     return df
    
 preparedata()

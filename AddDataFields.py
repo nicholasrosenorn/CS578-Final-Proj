@@ -9,7 +9,7 @@
 #   s and p day change %
 #   beta 
 #   1 year interest rate
-#   pharmacutical labal TODO NICK
+#   pharmacutical labal 
 #   earnings per share TODO: note: this maybe should done after getting data of interest (ie: in generateMLData) JP
 
 
@@ -21,6 +21,7 @@ import pandas as pd
 import numpy as np
 import math
 import yfinance as yf
+import Header
 
 
 #column indexes
@@ -246,10 +247,11 @@ def spReturn(df, length, spy):
 
     return df
 
+#TODO add something to fix NaN's by going to next closest day
 # adds interest rate data to dfs
 def interest_rates(df):
     # read interest rate data 
-    int_rates = pd.read_csv("Development Dataset/yield-curve-rates-1990-2021.csv")
+    int_rates = pd.read_csv(Header.interest_rates)
     int_rates["<DATE>"] = pd.to_datetime(int_rates["Date"], format='%m/%d/%y')
     
     #join data by date

@@ -15,6 +15,7 @@
 import pandas as pd
 from scipy.stats import norm
 import math
+import TickerLabels
 
 
 #column indexes
@@ -33,9 +34,12 @@ f22dayindex = 11
 f44dayindex = 12
 f66dayindex = 13
 interestindex = 14
-optionpriceindex = 15
-profitindex = 16
-labelindex = 17
+sectorindex = 15
+industryindex = 16
+
+optionpriceindex = 17
+profitindex = 18
+labelindex = 19
 
 #TODO check work
 #selects data based on minimum criteria
@@ -46,6 +50,8 @@ def selectData(df, stockprice, stockpercentage):
         #    df.drop(i)
     df = df[df['<CHANGE>'] > stockpercentage]
     df = df[df['<CLOSE>'] > stockprice]
+
+    df = TickerLabels.join_labels_combined(df)
     
 
     return df
@@ -80,7 +86,7 @@ def calcProfit(df, strikepercentage, daystoexpire, pricemodel, profitformula):
             df['<LABEL>'] = 0
 
             for i in range(0, len(df.index)):
-                df.iat[i, profitindex] = max(df.iat[i, closeindex] * strikepercentage - df.iat[i, daysindex], 0) - df.iat[i, optionpriceindex]
+                df.iat[i, profitindex] = float("{:.2f}".format(max(df.iat[i, closeindex] * strikepercentage - df.iat[i, daysindex], 0) - df.iat[i, optionpriceindex]))
 
                 if(df.iat[i, profitindex] > 0):
                     df.iat[i, labelindex] = 1
@@ -107,7 +113,7 @@ def european(df, strikepercentage, daystoexpire):
 
         price = norm.cdf(-d2)*k*math.exp(-r*t) - norm.cdf(-d1)*p
 
-        df.iat[i, optionpriceindex] = price
+        df.iat[i, optionpriceindex] = float("{:.2f}".format(price))
 
 
 
@@ -128,7 +134,7 @@ def american1(df, strikepercentage, daystoexpire):
 
 
         price = k * (k / p * (1 - 2*r / (2*r + sd**2) ) ) ** (2*r / (sd **2) )
-        df.iat[i, optionpriceindex] = price
+        df.iat[i, optionpriceindex] = float("{:.2f}".format(price))
     return df
 
 
@@ -152,5 +158,5 @@ def american2(df, strikepercentage, daystoexpire):
         
         price = k / (1 - h2) * ((h2 - 1) / h2 * (p / k)) ** h2 
 
-        df.iat[i, optionpriceindex] = price
+        df.iat[i, optionpriceindex] = float("{:.2f}".format(price))
     return df
