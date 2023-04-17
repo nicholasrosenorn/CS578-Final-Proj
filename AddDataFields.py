@@ -20,6 +20,7 @@
 import pandas as pd
 import numpy as np
 import math
+import yfinance as yf
 
 
 #column indexes
@@ -259,9 +260,6 @@ def interest_rates(df):
 
     return df
 
-#TODO
-#label if compnay is a pharmacutical company
-#def pharmIndustry():
 
 
 #TODO
