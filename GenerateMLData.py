@@ -3,7 +3,7 @@
 #add: 
 #   Select Data
 #   European put price 
-#   American perpetual put price TODO IAN
+#   American perpetual put price (two versions)
 #   Calc Profit
 #   
 
@@ -17,20 +17,41 @@ from scipy.stats import norm
 import math
 
 
+#column indexes
+tickerindex = 0
+dateindex = 1
+closeindex = 2
+changeindex = 3
+_22daychangeindex = 4
+_44daychangeindex = 5
+_66daychangeindex = 6
+hvindex = 7
+spychangeindex = 8
+spyhvindex = 9
+betaindex = 10
+f22dayindex = 11
+f44dayindex = 12
+f66dayindex = 13
+interestindex = 14
+optionpriceindex = 15
+profitindex = 16
+labelindex = 17
 
 #TODO check work
 #selects data based on minimum criteria
 def selectData(df, stockprice, stockpercentage):
     # if price > stockprice and change > stockpercentage then add
-
-    for i in range(0, len(df.index)):
-        if(df[i, 2] < stockprice or df[i, 3] < stockpercentage):
-            df.drop(i)
+    #for i in range(0, len(df.index)):
+        #if(df.iat[i, closeindex] < stockprice or df.iat[i, changeindex] < stockpercentage):
+        #    df.drop(i)
+    df = df[df['<CHANGE>'] > stockpercentage]
+    df = df[df['<CLOSE>'] > stockprice]
+    
 
     return df
 
 #TODO check work
-def calcProfit(df, strikepercentage, daystoexpire, american, profitformula):    
+def calcProfit(df, strikepercentage, daystoexpire, pricemodel, profitformula):    
     
     match profitformula:
         case 1:
@@ -39,62 +60,97 @@ def calcProfit(df, strikepercentage, daystoexpire, american, profitformula):
 
             match daystoexpire:
                 case 22:
-                    daysindex = 11
+                    daysindex = f22dayindex
                 case 44:
-                    daysindex = 12
+                    daysindex = f44dayindex
                 case 66:
-                    daysindex = 13
+                    daysindex = f66dayindex
 
-            if(american):
-                df = american(df, strikepercentage, daystoexpire)
-                #TODO
-                return df
-            else:
-                df = european(df, strikepercentage, daystoexpire)
+
+            match pricemodel:
+
+                case 0:
+                    df = european(df, strikepercentage, daystoexpire)
+                case 1:
+                    df = american1(df, strikepercentage, daystoexpire)
+                case 2:
+                    df = american2(df, strikepercentage, daystoexpire)
+
+            df['<PROFIT>'] = "{:.2f}".format(0.00)
+            df['<LABEL>'] = 0
+
+            for i in range(0, len(df.index)):
+                df.iat[i, profitindex] = max(df.iat[i, closeindex] * strikepercentage - df.iat[i, daysindex], 0) - df.iat[i, optionpriceindex]
+
+                if(df.iat[i, profitindex] > 0):
+                    df.iat[i, labelindex] = 1
+
                 
-
-                length = len(df.columns)
-                df['<PROFIT>'] = "{:.2f}".format(0.00)
-                df['<LABEL>'] = 0
-
-                for i in range(0, len(df.index)):
-                    df[i, length] = max(df[i, 2] * strikepercentage - df[i, daysindex], 0) - df[i, length -1]
-
-                    if(df[i, length] > 0):
-                        df[length + 1] = 1
-
-                return df
-            
             
     return df
 
 
-#TODO check math
+#calculates the price of a european option
 def european(df, strikepercentage, daystoexpire):
-    t = daystoexpire
+    t = daystoexpire / 365
 
-    length = len(df.columns)
     df['<PRICE>'] = "{:.2f}".format(0.00)
 
     for i in range(0, len(df.index)):
-        p = df.iat[i, 2] #stock price
-        k = strikepercentage * p #will be stock price
-        r = 1 #interest rate
-        sd = df.iat[i, 7] #volatility
+        p = df.iat[i, closeindex] #stock price
+        k = strikepercentage * p #strike value
+        r = df.iat[i, interestindex ] / 100 #interest rate, given as percentage
+        sd = df.iat[i, hvindex] #volatility
         
-
         d1 = (math.log(1/strikepercentage) + (r+(sd**2)/2)*t) / (sd*math.sqrt(t))
         d2 = d1 - sd*math.sqrt(t)
 
         price = norm.cdf(-d2)*k*math.exp(-r*t) - norm.cdf(-d1)*p
-        df[i, length] = price
+
+        df.iat[i, optionpriceindex] = price
 
 
 
     return df
 
-#TODO
-# add formula for american perpetual put
-def american(df, strikepercentage, daystoexpire):
 
+# add formula for american perpetual put
+#formula from http://www.stat.uchicago.edu/~lalley/Courses/391/Lecture15.pdf
+def american1(df, strikepercentage, daystoexpire):
+
+    df['<PRICE>'] = "{:.2f}".format(0.00)
+
+    for i in range(0, len(df.index)):
+        p = df.iat[i, closeindex] #stock price
+        k = strikepercentage * p #strike value
+        r = df.iat[i, interestindex ] / 100 #interest rate, given as percentage
+        sd = df.iat[i, hvindex] #volatility
+
+
+        price = k * (k / p * (1 - 2*r / (2*r + sd**2) ) ) ** (2*r / (sd **2) )
+        df.iat[i, optionpriceindex] = price
+    return df
+
+
+# add formula for american perpetual put
+#formula from https://en.wikipedia.org/wiki/Black%E2%80%93Scholes_model
+# and https://web.ma.utexas.edu/users/mcudina/Lecture14_1and2.pdf
+#assumes no dividend
+def american2(df, strikepercentage, daystoexpire):
+
+    df['<PRICE>'] = "{:.2f}".format(0.00)
+
+    for i in range(0, len(df.index)):
+        p = df.iat[i, closeindex] #stock price
+        k = strikepercentage * p #strike value
+        r = df.iat[i, interestindex ] / 100 #interest rate, given as percentage
+        sd = df.iat[i, hvindex] #volatility
+        var = sd ** 2
+
+        h1 = ( - (r - .5 * var) + math.sqrt((r - .5 * var) ** 2 + 2*var*r) ) / var
+        h2 = ( - (r - .5 * var) - math.sqrt((r - .5 * var) ** 2 + 2*var*r) ) / var
+        
+        price = k / (1 - h2) * ((h2 - 1) / h2 * (p / k)) ** h2 
+
+        df.iat[i, optionpriceindex] = price
     return df

@@ -9,7 +9,7 @@ import pandas as pd
 import GenerateMLData
 
 #This is all data in one file
-inputfile = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\combined.txt" 
+inputfile = r"C:\Users\imhun\Documents\CS 578\Project\Data set\Development Dataset\output\combined.txt" 
 
 
 #hyperparameters:
@@ -17,7 +17,7 @@ strikepercentage = .9   #percentage of stock price to strike price
 daystoexpire = 22       #should be 22, 44, or 66
 
 #model parameters
-american = True         #true for american perpetual, false for european
+pricemodel = 0          #0 = european, 1 = american perpetual v1, 2 = american perpertual v2
 profitformula = 1       #1 = profit at expiration
 
 #selection criteria
@@ -28,13 +28,17 @@ minstockgain = 10       #minimum percent daily change to be selected
 
 def preparedata():
     df = pd.read_csv(inputfile, sep="\t")
-
     df = GenerateMLData.selectData(df, minstockprice, minstockgain)
 
-    df = GenerateMLData.calcProfit(df, strikepercentage, daystoexpire, american, profitformula)
+    df = GenerateMLData.calcProfit(df, strikepercentage, daystoexpire, pricemodel, profitformula)
+    print(df)
 
     return df
    
+preparedata()
+print("DONE PREPARE DATA")
+
+
 #TODO JP
 #may reorganize structure
 # do we need to code own or can use sklearn?

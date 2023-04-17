@@ -164,7 +164,7 @@ def futurePrices(df, length):
 
 
 #caluclates volatility over last 22 days (b/c VIX is 30 days)
-# and then annualizes it
+# and then annualizes it - 252 trading periods a year
 #SOA version of volatility for lognormal stock model
 def calcVolatility(df, length):
     df['<HV>'] = "{:.4f}".format(0.0000)
@@ -175,7 +175,7 @@ def calcVolatility(df, length):
         log_change.append(math.log(justclose[i] / justclose[i-1]))
     for i in range(23, length):
         variance = np.var(log_change[i-23:i], ddof = 1)
-        df.iat[i, hvindex] = "{:.4f}".format(math.sqrt(variance * 365))
+        df.iat[i, hvindex] = "{:.4f}".format(math.sqrt(variance * 252))
 
     return df
 

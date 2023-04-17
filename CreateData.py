@@ -44,7 +44,7 @@ def importdata():
     df = AddDataFields.addOtherData(df, length)
     
     
-    df.to_csv(r"C:\Users\imhun\Documents\CS 578\Project\Data set\aapl.us_test.txt", sep = '\t')
+    df.to_csv(r"C:\Users\imhun\Documents\CS 578\Project\Data set\aapl.us_test.txt", sep = '\t', index = False)
     
 
 
@@ -80,7 +80,7 @@ def importdatagroup():
     frame = pd.concat(li, axis=0, ignore_index=True)
 
     #make sure output file is not in "path" because then it gets included in "all_files"
-    frame.to_csv(outputfile, sep = '\t')
+    frame.to_csv(outputfile, sep = '\t', index= False)
 
 
 importdatagroup()
