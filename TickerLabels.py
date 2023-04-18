@@ -50,6 +50,6 @@ def get_sector(ticker):
 def get_industry(ticker):
     return yf.Ticker(ticker).info['industry']
 
-#labels()
+labels()
 
 #join_labels_combined()

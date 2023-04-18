@@ -120,7 +120,10 @@ def removeColumns(df, length):
 def calcDailyChange(df, length):
     df['<CHANGE>'] = "{:.4f}".format(0.0000)
     for i in range(1, length):
-        df.iat[i, changeindex] = "{:.4f}".format((df.iat[i, closeindex] - df.iat[i-1, closeindex]) / df.iat[i-1, closeindex] * 100)
+        if df.iat[i, closeindex] == 0 or df.iat[i-1, closeindex] == 0:
+            df.iat[i, changeindex] = 0
+        else:
+            df.iat[i, changeindex] = "{:.4f}".format((df.iat[i, closeindex] - df.iat[i-1, closeindex]) / df.iat[i-1, closeindex] * 100)
 
     return df
 
@@ -174,7 +177,12 @@ def calcVolatility(df, length):
     justclose = justclose.astype(float)
     log_change = list()
     for i in range(1, length):
-        log_change.append(math.log(justclose[i] / justclose[i-1]))
+        if justclose[i] == 0 or justclose[i-1] == 0:
+            temp = 1
+        else:
+            temp = justclose[i] / justclose[i-1]
+
+        log_change.append(math.log(temp))
     for i in range(23, length):
         variance = np.var(log_change[i-23:i], ddof = 1)
         df.iat[i, hvindex] = "{:.4f}".format(math.sqrt(variance * 252))

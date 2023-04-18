@@ -34,12 +34,18 @@ f22dayindex = 11
 f44dayindex = 12
 f66dayindex = 13
 interestindex = 14
+"""
 sectorindex = 15
 industryindex = 16
 
 optionpriceindex = 17
 profitindex = 18
 labelindex = 19
+"""
+
+optionpriceindex = 15
+profitindex = 16
+labelindex = 17
 
 #TODO check work
 #selects data based on minimum criteria
@@ -51,7 +57,7 @@ def selectData(df, stockprice, stockpercentage):
     df = df[df['<CHANGE>'] > stockpercentage]
     df = df[df['<CLOSE>'] > stockprice]
 
-    df = TickerLabels.join_labels_combined(df)
+    #df = TickerLabels.join_labels_combined(df)
     
 
     return df

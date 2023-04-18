@@ -18,6 +18,9 @@ import Header
 #d_us_txt.zip\data\daily\us\nasdaq stocks and
 #d_us_txt.zip\data\daily\us\nyse stocks
 # I put all ~5,000 text files into one folder
+#  notes:
+#   amci.us.txt is empty - deleted from folder
+#   others were moved into a different folder incase needed - unlikley
 
 #I created a subset of 10 files to use for testing and developing
 
@@ -25,7 +28,7 @@ import Header
 folderpath = Header.raw_stock_folder
 outputfile = Header.combined_stock_data
 spyfilepath = Header.spy_path
-singlefilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\aapl.us.txt"
+singlefilepath = r"C:\Users\imhun\Documents\CS 578\Project\Data set\RAW NYSE and NASDAQ\acqrw.us.txt"
 
 
 
@@ -75,7 +78,7 @@ def importdatagroup():
         if (i % 100 == 0):
             print("Progress: ", i)
 
-
+        print(filename)
         df = pd.read_csv(filename, sep=",", index_col=None, header=0)
         length = len(df.index)
         df = df.round(2)
